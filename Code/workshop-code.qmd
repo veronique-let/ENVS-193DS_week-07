@@ -1,0 +1,85 @@
+---
+title: "Week 7 Coding Workshop"
+author: "Veronique Letourneau"
+date: "2023-05-17"
+format: html
+editor: visual
+execute: 
+  warning: false
+---
+
+```{r libraries}
+
+# should haves
+library(tidyverse)
+library(here)
+library(lterdatasampler)
+
+# NEW PACKAGES
+# To check the performance of model and diagnostic
+library(performance)
+
+# To put all of outputs of model into table
+library(broom)
+
+# Table making package 
+library(flextable)
+
+# Get perdictions from models, and pull the numbers and plot them 
+library(ggeffects)
+
+# Allows to pull out ANOVA tables for linear models 
+library(car)
+
+library(naniar)
+```
+
+## Linear Models
+
+How does stem length *predict* stem dry mass
+
+```{r filtering-data}
+
+maples_data <- hbr_maples %>% 
+  filter(year -- 2003 & watershed == "Reference")
+```
+
+Visualizing missing data
+
+```{r missing-data-vis}
+gg_miss_var(maples_data)
+```
+
+Create an exploratory data visualization
+
+```{r explore-vis}
+ggplot(data=maples_data, aes(x = stem_length, y = stem_dry_mass)) + 
+  geom_point()
+```
+
+Let's try a model
+
+```{r linear-model-maples}
+# lm = linear model (~ (what should be predicting)
+maples_model <- lm(stem_dry_mass ~ stem_length, data = maples_data)
+
+maples_model
+```
+
+Check our assumptions:
+
+1.  Linear relationship b/w variables: YES! (used the exploratory data vis. to check that)
+2.  Independence of errors: YES! (making that assumption based in how the data were collected)
+3.  Homoskedasticity of errors: YES! (making that decision from the residuals vs. fitted plot/scale-location plots)
+4.  Normally distributed errors: YES! (looking at QQ plot of residuals)
+
+```{r check-assumptions}
+par(mfrow = c(2, 2)) 
+plot(maples_model)
+```
+
+Turn off the 2x2 grid (as a blank slate)
+
+```{r turning-off-the-grid, results = FALSE}
+dev.off()
+```
